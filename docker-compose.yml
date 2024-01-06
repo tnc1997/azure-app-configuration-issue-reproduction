@@ -1,0 +1,25 @@
+services:
+  azure-app-configuration-emulator:
+    build:
+      context: https://github.com/tnc1997/azure-app-configuration-emulator.git
+      dockerfile: ./src/AzureAppConfigurationEmulator/Dockerfile
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8080:8080"
+  azure-sdk-for-js:
+    build:
+      context: ./AzureSdkForJs
+      dockerfile: ./Dockerfile
+    depends_on:
+      - azure-app-configuration-emulator
+    environment:
+      - ConnectionStrings__AzureAppConfiguration=Endpoint=http://azure-app-configuration-emulator:8080;Id=abcd;Secret=c2VjcmV0;
+  azure-sdk-for-net:
+    build:
+      context: .
+      dockerfile: ./AzureSdkForNet/Dockerfile
+    depends_on:
+      - azure-app-configuration-emulator
+    environment:
+      - ConnectionStrings__AzureAppConfiguration=Endpoint=http://azure-app-configuration-emulator:8080;Id=abcd;Secret=c2VjcmV0;
